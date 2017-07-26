@@ -13,7 +13,8 @@ Dataset images can be _loaded_ or *patched* from giant montage of all images.
 
 Every idea is a seperate branch with the same tag
 
--   `UNET`  -  Train u-net autoencoder on *patched* **Manga546**
+-   `UNET`  -  U-net autoencoder on *patched* **Manga546**
+-   `simple-conv` -  Few convolutional layers on _patched_ **Manga546**
 
 
 

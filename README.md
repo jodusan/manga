@@ -1,7 +1,21 @@
-# README Boilerplate
+# Project MANGA PSIML2017
 
 I use this backpack repo for my software engineering adventures!
 Change this readme as needed. Use [Peek](https://github.com/phw/peek) to make gifs for showcase.
+
+# Datasets
+
+Dataset images can be _loaded_ or *patched* from giant montage of all images.
+
+-   `Manga546` -  546 images of color and bw - size 950x640
+
+# Ideas
+
+Every idea is a seperate branch with the same tag
+
+-   `UNET`  -  Train u-net autoencoder on *patched* **Manga546**
+
+
 
 ## Installation
 

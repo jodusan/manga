@@ -15,6 +15,7 @@ Every idea is a seperate branch with the same tag
 
 -   `UNET`  -  U-net autoencoder on *patched* **Manga546**
 -   `simple-conv` -  Few convolutional layers on _patched_ **Manga546**
+-   `UNET-LOAD` - U-net autoencoder on _loaded_ Manga546
 
 
 

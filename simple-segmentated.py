@@ -28,14 +28,16 @@ def predict_image(image, model, isz, num_bins, num_channels):
 
 
 if __name__ == "__main__":
-    isz = 128 
+    isz = 200 
 
     test_model = Sequential()
-    test_model.add(Conv2D(10, kernel_size=(3, 3), padding='same', input_shape=(isz, isz, 1)))
+    test_model.add(Conv2D(10, kernel_size=(5, 5), padding='same', input_shape=(isz, isz, 1)))
     test_model.add(BatchNormalization())
-    test_model.add(Conv2D(32, kernel_size=(3, 3), padding='same'))
+    test_model.add(Conv2D(32, kernel_size=(3, 3), padding='same', activation='relu'))
     test_model.add(BatchNormalization())
-    test_model.add(Conv2D(8, kernel_size=(6,6), padding='same', activation='relu'))
+    test_model.add(Conv2D(32, kernel_size=(3, 3), padding='same', activation='relu'))
+    test_model.add(BatchNormalization())
+    test_model.add(Conv2D(8, kernel_size=(6,6), padding='same', activation='softmax'))
     #test_model.add(Conv2D(3, (2, 2), activation='relu', padding='same'))
     test_model.compile(loss=keras.losses.categorical_crossentropy,
                        optimizer=keras.optimizers.Adam(lr=0.0001),
@@ -46,7 +48,7 @@ if __name__ == "__main__":
     x_large = generate_bw_image(y_large)
 
     print("Loaded dataset")
-    x, unseg_y = generate_patches(x_large, y_large, amount=5000, patch_wh=isz)
+    x, unseg_y = generate_patches(x_large, y_large, amount=8200, patch_wh=isz)
 
     print("unseg_y shape", unseg_y.shape)
 
@@ -60,7 +62,7 @@ if __name__ == "__main__":
     print("Generated patches")
     del x_large, y_large
 
-    #test_model.fit(x, y, epochs=1, batch_size=32, validation_split=0.1)
+    test_model.fit(x, y, epochs=20, batch_size=16, validation_split=0.05)
 
     # inpt = x[900:]
     # res = test_model.predict(inpt)

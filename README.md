@@ -1,21 +1,23 @@
 # Project MANGA PSIML2017
 
-I use this backpack repo for my software engineering adventures!
-Change this readme as needed. Use [Peek](https://github.com/phw/peek) to make gifs for showcase.
+Coloring manga
 
 # Datasets
 
 Dataset images can be _loaded_ or *patched* from giant montage of all images.
 
 -   `Manga546` -  546 images of color and bw - size 950x640
+-   `MangaOnline` -  42215 images of color - size 512x512
 
 # Ideas
 
-Every idea is a seperate branch with the same tag
+Every list entry is an idea implemented on the branch of the same name
 
 -   `UNET`  -  U-net autoencoder on *patched* **Manga546**
 -   `simple-conv` -  Few convolutional layers on _patched_ **Manga546**
--   `UNET-LOAD` - U-net autoencoder on _loaded_ Manga546
+-   `UNET-LOAD` - U-net autoencoder on _loaded_ **Manga546**
+-   `UNET-ONLINE` - U-net autoencoder on loaded **MangaOnline**
+-   `simple-segmentated` - Few convolutional layers on _patched_ **Manga546**
 
 
 

@@ -30,13 +30,16 @@ def load_all_images(folder, bw, resize_x=640, resize_y=950):
 
 def image_loader_generator(folder, bw, resize_x=640, resize_y=950, batch_size=1000, generate_bw=False):
     filename_list = sorted(os.listdir(folder))
+    print(len(filename_list))
+    
 
-    for i in range(len(filename_list)):
+    i = 0
+    while i < len(filename_list):
         image_batch_color = []
         if generate_bw:
             image_batch_bw = []
         j = 0
-        while j < batch_size:
+        while j < batch_size and i < len(filename_list):
             img = misc.imread(os.path.join(folder, filename_list[i]), bw).astype(np.uint8)
             if not bw:
                 if not is_bw(img):
@@ -45,15 +48,14 @@ def image_loader_generator(folder, bw, resize_x=640, resize_y=950, batch_size=10
                     if generate_bw:
                         image_batch_bw.append(generate_adaptive_bw_image(resized_color_image))
                 else:
-                    print(j)
                     j -= 1
             j += 1
             i += 1
 
         if generate_bw:
-            yield image_batch_bw, image_batch_color
+            yield (np.array(image_batch_bw)/255)[..., None], np.array(image_batch_color)/255
         else:
-            yield image_batch_color
+            yield np.array(image_batch_color)/255
 
 
 def make_giant_image(image_list):

@@ -77,11 +77,11 @@ def get_unet(isz):
 
 
 def main():
-    isz = 192 
+    isz = 512 
 
 
     load_weights = True
-    weights_file = 'weights/U-NET-DSTL1.hdf5'
+    weights_file = 'weights/U-NET-DSTL2.hdf5'
 
     main_model, model_name = get_unet(isz)
 
@@ -95,15 +95,18 @@ def main():
     x_large = generate_bw_image(y_large)
 
     print("Loaded dataset")
-    x, y = generate_patches(x_large, y_large, amount=8200, patch_wh=isz)
+    x, y = generate_patches(x_large, y_large, amount=1500, patch_wh=isz)
     print("Generated patches")
     del x_large, y_large
 
     checkpointer = ModelCheckpoint('weights/'+model_name+'.hdf5', save_best_only=True)
-    main_model.fit(x, y, epochs=130, batch_size=16, validation_split=0.025, callbacks=[checkpointer])
+    main_model.fit(x, y, epochs=24, batch_size=2, validation_split=0.025, callbacks=[checkpointer])
 
-    misc.imsave("prediction.jpg",
-                predict_image(generate_bw_image(misc.imread("data/Manga546/color/1.jpg")), main_model, isz))
+    files = ['660.jpg', '661.jpg', '662.jpg', '663.jpg', '666.jpg', '667.jpg', '668.jpg', '669.jpg']
+
+    for i, filename in enumerate(files):
+        misc.imsave("out/"+filename,predict_image(generate_bw_image(misc.imread("data/Manga546/color/"+filename)), main_model, isz))
+        
 
 
 if __name__ == "__main__":

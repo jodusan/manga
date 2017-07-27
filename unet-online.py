@@ -10,6 +10,7 @@ from preprocess_images import generate_bw_image
 from dataset import generate_patches, image_loader_generator
 from scipy import misc
 import numpy as np
+import os
 
 
 def predict_image(image, model, isz):
@@ -71,7 +72,7 @@ def get_unet(isx, isy):
     conv10 = Conv2D(3, (1, 1), activation="sigmoid")(conv9)
 
     model = Model(inputs=inputs, outputs=conv10)
-    model.compile(optimizer=keras.optimizers.Adam(lr=0.00001),
+    model.compile(optimizer=keras.optimizers.Adam(lr=0.0001),
                             loss=keras.losses.MSE,
                   metrics=["accuracy", keras.losses.mean_absolute_error])
     return model, name
@@ -85,7 +86,7 @@ def main():
     im_height = 256
     im_width = 256
 
-    load_weights = False
+    load_weights = True
 
     main_model, model_name = get_unet(im_width, im_height)
 
@@ -97,13 +98,17 @@ def main():
 
 
     checkpointer = ModelCheckpoint('weights/'+model_name+'.hdf5')
+    tensorboard = keras.callbacks.TensorBoard(log_dir='./logs',
+                 histogram_freq=1,
+                 write_graph=True,
+                 write_images=False)
 
     manga_generator = image_loader_generator("data/MangaOnline/", 
             False, resize_x=im_width, resize_y=im_height, batch_size=16, generate_bw= True)
     a = next(manga_generator)
     print(a[0].shape)
     print(a[1].shape)
-    main_model.fit_generator(manga_generator, 1250, epochs=2, verbose=1, callbacks=[checkpointer])
+    main_model.fit_generator(manga_generator, 12, epochs=2, verbose=1, callbacks=[checkpointer, tensorboard])
 
     misc.imsave("prediction.jpg", main_model.predict(next(manga_generator)[0])[0])
 

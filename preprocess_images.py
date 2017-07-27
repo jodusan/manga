@@ -100,15 +100,17 @@ def image_segmentation(img, number_of_bins):
     return res
 
 
-def image_desegmentation(segmented_image, number_of_bins):
-    result = np.zeros((segmented_image.shape[0], segmented_image.shape[1], 3), dtype=np.uint8)
+def image_desegmentation(input_image, number_of_bins):
+    argmax = np.argmax(input_image, axis=2)
+    pprint(argmax)
+    result = np.zeros((input_image.shape[0], input_image.shape[1], 3), dtype=np.uint8)
     bin_size = 256 // number_of_bins
-    for i in range(segmented_image.shape[2]):
+    for i in range(number_of_bins**3):
         b = i % number_of_bins
         g = i // number_of_bins % number_of_bins
         r = i // (number_of_bins ** 2) % number_of_bins
         pixel_value = bin_size * np.array([r, g, b], dtype=np.uint8) + bin_size // 2
-        result[segmented_image[:, :, i]] = pixel_value
+        result[argmax == i] = pixel_value
 
     return result
 

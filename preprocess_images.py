@@ -3,7 +3,7 @@ from pprint import pprint
 import numpy as np
 from scipy import misc
 import time
-
+import cv2
 #
 # height = 950
 # width = 640
@@ -69,11 +69,18 @@ import time
 # plt.hist(coorelation_coefs)
 # plt.show()
 # print(coorelation_coefs)
-from dataset import load_all_images
 
 
 def generate_bw_image(img, axis=2):
     return np.mean(img, axis=axis) > 60
+
+
+def generate_adaptive_bw_image(img):
+    gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    adaptive = cv2.adaptiveThreshold(gray_image, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 15, 7)
+    threshold = gray_image > 40
+    bw_image = adaptive * threshold
+    return bw_image
 
 
 def bin_colors(img, number_of_bins=2):
@@ -102,10 +109,9 @@ def image_segmentation(img, number_of_bins):
 
 def image_desegmentation(input_image, number_of_bins):
     argmax = np.argmax(input_image, axis=2)
-    pprint(argmax)
     result = np.zeros((input_image.shape[0], input_image.shape[1], 3), dtype=np.uint8)
     bin_size = 256 // number_of_bins
-    for i in range(number_of_bins**3):
+    for i in range(number_of_bins ** 3):
         b = i % number_of_bins
         g = i // number_of_bins % number_of_bins
         r = i // (number_of_bins ** 2) % number_of_bins
@@ -116,21 +122,22 @@ def image_desegmentation(input_image, number_of_bins):
 
 
 if __name__ == "__main__":
-    bins = 2
-    depth = bins ** 3
-    images = load_all_images('train_dataset/color', False, resize_x=512, resize_y=768)
-    print("loaded dataset")
-    start_time = time.time()
-    y = np.empty((len(images), images[0].shape[0], images[0].shape[1], depth), dtype=np.uint8)
-    for i in range(len(images)):
-        im = bin_colors(images[i], 2)
-        y[i] = image_segmentation(im, 2)
-    print(time.time() - start_time)
-    print("finished")
-    start_time = time.time()
-    np.save("train_dataset/color_seg", y)
-    print(time.time() - start_time)
-    del y
-    start_time = time.time()
-    y = np.load("train_dataset/color_seg.npy")
-    print(time.time() - start_time)
+    pass
+    # bins = 2
+    # depth = bins ** 3
+    # images = load_all_images('train_dataset/color', False, resize_x=512, resize_y=768)
+    # print("loaded dataset")
+    # start_time = time.time()
+    # y = np.empty((len(images), images[0].shape[0], images[0].shape[1], depth), dtype=np.uint8)
+    # for i in range(len(images)):
+    #     im = bin_colors(images[i], 2)
+    #     y[i] = image_segmentation(im, 2)
+    # print(time.time() - start_time)
+    # print("finished")
+    # start_time = time.time()
+    # np.save("train_dataset/color_seg", y)
+    # print(time.time() - start_time)
+    # del y
+    # start_time = time.time()
+    # y = np.load("train_dataset/color_seg.npy")
+    # print(time.time() - start_time)

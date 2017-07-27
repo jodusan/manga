@@ -3,8 +3,17 @@ import os
 import numpy as np
 import random
 
+from preprocess_images import generate_adaptive_bw_image
+
 height = 950
 width = 640
+
+
+def is_bw(image):
+    mask = image[:, :, 0] * (image[:, :, 0] == image[:, :, 1]) == image[:, :, 2]
+    if np.sum(mask) >= image.shape[0] * image.shape[1] - 1000:
+        return True
+    return False
 
 
 def load_all_images(folder, bw, resize_x=640, resize_y=950):
@@ -12,9 +21,39 @@ def load_all_images(folder, bw, resize_x=640, resize_y=950):
 
     for filename in sorted(os.listdir(folder)):
         img = misc.imread(os.path.join(folder, filename), bw).astype(np.uint8)
-        image_list.append(misc.imresize(img, (resize_y, resize_x)))
+        if not bw:
+            if not is_bw(img):
+                image_list.append(misc.imresize(img, (resize_y, resize_x)))
 
     return image_list
+
+
+def image_loader_generator(folder, bw, resize_x=640, resize_y=950, batch_size=1000, generate_bw=False):
+    filename_list = sorted(os.listdir(folder))
+
+    for i in range(len(filename_list)):
+        image_batch_color = []
+        if generate_bw:
+            image_batch_bw = []
+        j = 0
+        while j < batch_size:
+            img = misc.imread(os.path.join(folder, filename_list[i]), bw).astype(np.uint8)
+            if not bw:
+                if not is_bw(img):
+                    resized_color_image = misc.imresize(img, (resize_y, resize_x))
+                    image_batch_color.append(resized_color_image)
+                    if generate_bw:
+                        image_batch_bw.append(generate_adaptive_bw_image(resized_color_image))
+                else:
+                    print(j)
+                    j -= 1
+            j += 1
+            i += 1
+
+        if generate_bw:
+            yield image_batch_bw, image_batch_color
+        else:
+            yield image_batch_color
 
 
 def make_giant_image(image_list):
@@ -45,7 +84,7 @@ def generate_patches(image_x, image_y, amount=1000, patch_wh=128):
         result_x[i] = image_x[x:x + patch_wh, y:y + patch_wh][..., None]
         result_y[i] = image_y[x:x + patch_wh, y:y + patch_wh]
 
-    return result_x/255, result_y/255
+    return result_x / 255, result_y / 255
 
 
 if __name__ == "__main__":

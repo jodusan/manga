@@ -7,7 +7,7 @@ from keras.layers import Dense, Activation, Conv2D, Dropout, Flatten, MaxPooling
     concatenate
 from dataset import height, width, load_all_images
 from preprocess_images import generate_bw_image
-from dataset import generate_patches
+from dataset import generate_patches, image_loader_generator
 from scipy import misc
 import numpy as np
 
@@ -70,39 +70,27 @@ def get_unet(isx, isy):
     conv10 = Conv2D(3, (1, 1), activation="sigmoid")(conv9)
 
     model = Model(inputs=inputs, outputs=conv10)
-    model.compile(optimizer=keras.optimizers.Adam(lr=0.000001), loss=keras.losses.mean_absolute_error,
+    model.compile(optimizer=keras.optimizers.Adam(lr=0.0001), loss=keras.losses.mean_absolute_error,
                   metrics=["accuracy", keras.losses.mean_absolute_error])
     return model
 
 
-def get_test_model(isz):
-    test_model = Sequential()
-    test_model.add(Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=(isz, isz, 1), padding='same'))
-    test_model.add(Conv2D(64, (3, 3), activation='relu', padding='same'))
-    test_model.add(Conv2D(32, (3, 3), activation='relu', padding='same'))
-    test_model.add(Conv2D(3, (3, 3), activation='relu', padding='same'))
-    test_model.compile(loss=keras.losses.MAE,
-                       optimizer=keras.optimizers.Adam(lr=0.00001),
-                       metrics=['accuracy', keras.losses.MAE])
-    return test_model
-
-
 def main():
-
-    y = load_all_images('train_dataset/color', False, resize_x=512, resize_y=784)
     print("Loaded dataset")
 
 #    misc.imshow(y[0])
-    y = np.array(y)
-    x = generate_bw_image(y, axis=3)[..., None]
 
-    main_model = get_unet(*(y[0].shape[:2]))
+    im_height = 256
+    im_width = 256
 
-    print("X shape:,", x.shape, "Y shape:", y.shape)
 
-    main_model.fit(x, y, epochs=10, batch_size=1, validation_split=0.1)
+    main_model = get_unet()
 
-    misc.imsave("prediction.jpg", np.squeeze(main_model.predict(x[500][None, ...])))
+    manga_generator = image_loader_generator("data/MangaOnline/", 
+            False, resize_x=im_width, resize_y=im_height, batch_size=1, generate_bw= True)
+    main_model.fit_generator(manga_generator, 1250, epochs=1, verbose=1, callbacks=None)
+
+    misc.imsave("prediction.jpg", manga_generator.next()[0])
 
 if __name__ == "__main__":
     main()

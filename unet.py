@@ -1,4 +1,5 @@
 import keras
+import os
 from keras import Input
 from keras.engine import Model
 from keras.models import Sequential
@@ -25,14 +26,8 @@ def predict_image(image, model, isz):
             resulting_image[i * isz:(i + 1) * isz, j * isz:(j + 1) * isz] = model.predict(img_patch[None, ...])
     return resulting_image
 
-def get_unetv2(isz):
-    inputs = Input((isz, isz, 1))
-
-
-
-
-
 def get_unet(isz):
+    name = "UNET"
     inputs = Input((isz, isz, 1))
     conv1 = Conv2D(32, (3, 3), activation="relu", padding="same")(inputs)
     conv1 = Conv2D(32, (3, 3), activation="relu", padding="same")(conv1)
@@ -76,41 +71,39 @@ def get_unet(isz):
     conv10 = Conv2D(3, (1, 1), activation="sigmoid")(conv9)
 
     model = Model(inputs=inputs, outputs=conv10)
-    model.compile(optimizer=keras.optimizers.Adam(lr=0.0001), loss=keras.losses.mean_absolute_error,
+    model.compile(optimizer=keras.optimizers.Adam(lr=0.00001), loss=keras.losses.mean_absolute_error,
                   metrics=["accuracy", keras.losses.MSE])
-    return model
-
-
-def get_test_model(isz):
-    test_model = Sequential()
-    test_model.add(Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=(isz, isz, 1), padding='same'))
-    test_model.add(Conv2D(64, (3, 3), activation='relu', padding='same'))
-    test_model.add(Conv2D(32, (3, 3), activation='relu', padding='same'))
-    test_model.add(Conv2D(3, (3, 3), activation='relu', padding='same'))
-    test_model.compile(loss=keras.losses.MAE,
-                       optimizer=keras.optimizers.Adam(lr=0.0001),
-                       metrics=['accuracy', keras.losses.MAE])
-    return test_model
+    return model, name
 
 
 def main():
     isz = 192 
 
-    main_model = get_unet(isz)
 
-    y_large = misc.imread("train_dataset/color.png")
+    load_weights = True
+    weights_file = 'weights/U-NET-DSTL1.hdf5'
+
+    main_model, model_name = get_unet(isz)
+
+    if load_weights == True and os.path.isfile(weights_file):
+        print("Loaded weights")
+        main_model.load_weights(weights_file)
+
+
+    y_large = misc.imread("data/Manga546/color.png")
 
     x_large = generate_bw_image(y_large)
 
     print("Loaded dataset")
-    x, y = generate_patches(x_large, y_large, amount=8000, patch_wh=isz)
+    x, y = generate_patches(x_large, y_large, amount=8200, patch_wh=isz)
     print("Generated patches")
     del x_large, y_large
 
-    main_model.fit(x, y, epochs=15, batch_size=16, validation_split=0.1)
+    checkpointer = ModelCheckpoint('weights/'+model_name+'.hdf5', save_best_only=True)
+    main_model.fit(x, y, epochs=130, batch_size=16, validation_split=0.025, callbacks=[checkpointer])
 
     misc.imsave("prediction.jpg",
-                predict_image(generate_bw_image(misc.imread("train_dataset/color/1.jpg")), main_model, isz))
+                predict_image(generate_bw_image(misc.imread("data/Manga546/color/1.jpg")), main_model, isz))
 
 
 if __name__ == "__main__":

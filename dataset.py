@@ -30,11 +30,9 @@ def load_all_images(folder, bw, resize_x=640, resize_y=950):
 
 def image_loader_generator(folder, bw, resize_x=640, resize_y=950, batch_size=1000, generate_bw=False):
     filename_list = sorted(os.listdir(folder))
-    print(len(filename_list))
-    
 
     i = 0
-    while i < len(filename_list):
+    while True:
         image_batch_color = []
         if generate_bw:
             image_batch_bw = []
@@ -50,8 +48,7 @@ def image_loader_generator(folder, bw, resize_x=640, resize_y=950, batch_size=10
                 else:
                     j -= 1
             j += 1
-            i += 1
-
+            i = (i + 1) % len(filename_list)
         if generate_bw:
             yield (np.array(image_batch_bw)/255)[..., None], np.array(image_batch_color)/255
         else:

@@ -71,10 +71,16 @@ def get_unet(isx, isy):
     conv10 = Conv2D(3, (1, 1), activation="sigmoid")(conv9)
 
     model = Model(inputs=inputs, outputs=conv10)
+<<<<<<< HEAD:unet-online.py
     model.compile(optimizer=keras.optimizers.Adam(lr=0.00001),
                             loss=keras.losses.MSE,
                   metrics=["accuracy", keras.losses.mean_absolute_error])
     return model, name
+=======
+    model.compile(optimizer=keras.optimizers.Adam(lr=0.0001), loss=keras.losses.mean_absolute_error,
+                  metrics=["accuracy", keras.losses.mean_absolute_error])
+    return model
+>>>>>>> ef816c07c0dfacaba0e44afbc84498f3d3efc800:unet-online.py
 
 
 def main():
@@ -85,6 +91,7 @@ def main():
     im_height = 256
     im_width = 256
 
+<<<<<<< HEAD:unet-online.py
     load_weights = False
 
     main_model, model_name = get_unet(im_width, im_height)
@@ -106,6 +113,16 @@ def main():
     main_model.fit_generator(manga_generator, 1250, epochs=2, verbose=1, callbacks=[checkpointer])
 
     misc.imsave("prediction.jpg", main_model.predict(next(manga_generator)[0])[0])
+=======
+
+    main_model = get_unet()
+
+    manga_generator = image_loader_generator("data/MangaOnline/", 
+            False, resize_x=im_width, resize_y=im_height, batch_size=1, generate_bw= True)
+    main_model.fit_generator(manga_generator, 1250, epochs=1, verbose=1, callbacks=None)
+
+    misc.imsave("prediction.jpg", manga_generator.next()[0])
+>>>>>>> ef816c07c0dfacaba0e44afbc84498f3d3efc800:unet-online.py
 
 if __name__ == "__main__":
     main()

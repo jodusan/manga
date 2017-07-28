@@ -28,8 +28,8 @@ def predict_image(image, model, isz):
 
 
 def get_unet(isx, isy):
-    name = "UNET-ONLINE"
-    inputs = Input((isx, isy, 1))
+    name = "UNET-ONLINE-HINTED"
+    inputs = Input((isx, isy, 4))
     conv1 = Conv2D(32, (3, 3), activation="relu", padding="same")(inputs)
     conv1 = Conv2D(32, (3, 3), activation="relu", padding="same")(conv1)
     pool1 = MaxPooling2D(pool_size=(2, 2))(conv1)
@@ -86,7 +86,7 @@ def main():
     im_height = 256
     im_width = 256
 
-    load_weights = True
+    load_weights = False 
 
     main_model, model_name = get_unet(im_width, im_height)
 
@@ -118,7 +118,7 @@ def main():
             generate_bw = True)
 
     #main_model.fit_generator(train_generator, 1250, epochs=10, verbose=1, callbacks=[checkpointer, tensorboard])
-    main_model.fit_generator(train_generator, 1250, epochs=10, verbose=1, callbacks=[checkpointer, tensorboard], validation_data=val_generator, validation_steps=100)
+    main_model.fit_generator(train_generator, 1250, epochs=10, verbose=1, callbacks=[checkpointer, tensorboard], validation_data=val_generator, validation_steps=300)
     #misc.imsave("prediction.jpg", main_model.predict(next(manga_generator)[0])[0])
 #    read_img = misc.imread("asdf2.jpg", mode='L')
 #    read_img = misc.imresize(read_img, (256, 256))

@@ -6,7 +6,7 @@ from keras.callbacks import ModelCheckpoint, EarlyStopping, TensorBoard
 from keras.layers import Dense, Activation, Conv2D, Dropout, Flatten, MaxPooling2D, Convolution2D, merge, UpSampling2D, \
     concatenate
 from dataset import height, width, load_all_images
-from preprocess_images import generate_bw_image
+from preprocess_images import generate_bw_image,  generate_adaptive_bw_image 
 from dataset import generate_patches, image_loader_generator
 from scipy import misc
 import numpy as np
@@ -90,27 +90,47 @@ def main():
 
     main_model, model_name = get_unet(im_width, im_height)
 
-    weights_file = "weights/UNET-ONLINE.hdf5"
+    weights_file = "weights/UNET-ONLINE-WIN.hdf5"
 
-    if load_weights == True and os.path.isfile(weights_file):
+    if load_weights and os.path.isfile(weights_file):
         print("Loaded weights")
         main_model.load_weights(weights_file)
 
 
     checkpointer = ModelCheckpoint('weights/'+model_name+'.hdf5')
-    tensorboard = keras.callbacks.TensorBoard(log_dir='./logs',
+    tensorboard = keras.callbacks.TensorBoard(log_dir='./logs/test1/',
                  histogram_freq=1,
                  write_graph=True,
                  write_images=False)
 
-    manga_generator = image_loader_generator("data/MangaOnline/", 
-            False, resize_x=im_width, resize_y=im_height, batch_size=16, generate_bw= True)
-    a = next(manga_generator)
-    print(a[0].shape)
-    print(a[1].shape)
-#    main_model.fit_generator(manga_generator, 1250, epochs=40, verbose=1, callbacks=[checkpointer, tensorboard])
+    train_generator = image_loader_generator("data/MangaOnline/train/", 
+            False, 
+            resize_x=im_width,
+            resize_y=im_height,
+            batch_size=16,
+            generate_bw= True)
 
-    misc.imsave("prediction.jpg", main_model.predict(next(manga_generator)[0])[0])
+    val_generator = image_loader_generator("data/MangaOnline/test/", 
+            False,
+            resize_x = im_width,
+            resize_y = im_height,
+            batch_size = 16,
+            generate_bw = True)
+
+    #main_model.fit_generator(train_generator, 1250, epochs=10, verbose=1, callbacks=[checkpointer, tensorboard])
+    main_model.fit_generator(train_generator, 1250, epochs=10, verbose=1, callbacks=[checkpointer, tensorboard], validation_data=val_generator, validation_steps=100)
+    #misc.imsave("prediction.jpg", main_model.predict(next(manga_generator)[0])[0])
+#    read_img = misc.imread("asdf2.jpg", mode='L')
+#    read_img = misc.imresize(read_img, (256, 256))
+    
+    #misc.imsave("predict_asdf.jpg", main_model.predict(read_img[None, ..., None])[0])
+    for i in range(1,11):
+        read_img = misc.imread("data/MangaOnline/test/"+str(i)+".jpg")
+        print(read_img.shape)
+        read_img = misc.imresize(read_img, (256, 256))
+        read_img = generate_adaptive_bw_image(read_img)/255
+        misc.imsave("out/predicted_"+str(i)+".jpg", main_model.predict(read_img[None, ..., None])[0])
+
 
 if __name__ == "__main__":
     main()

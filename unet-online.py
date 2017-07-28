@@ -74,7 +74,7 @@ def get_unet(isx, isy):
     model = Model(inputs=inputs, outputs=conv10)
     model.compile(optimizer=keras.optimizers.Adam(lr=0.0001),
                             loss=keras.losses.MSE,
-                  metrics=["accuracy", keras.losses.mean_absolute_error])
+                  metrics=["accuracy", keras.losses.MSE])
     return model, name
 
 
@@ -108,7 +108,7 @@ def main():
     a = next(manga_generator)
     print(a[0].shape)
     print(a[1].shape)
-    main_model.fit_generator(manga_generator, 12, epochs=2, verbose=1, callbacks=[checkpointer, tensorboard])
+#    main_model.fit_generator(manga_generator, 1250, epochs=40, verbose=1, callbacks=[checkpointer, tensorboard])
 
     misc.imsave("prediction.jpg", main_model.predict(next(manga_generator)[0])[0])
 

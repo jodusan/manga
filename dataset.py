@@ -27,8 +27,16 @@ def load_all_images(folder, bw, resize_x=640, resize_y=950):
 
     return image_list
 
+def generate_hint(img):
+    blrd = img.copy()
+    for i in range(40):
+        x = np.random.randint(245)
+        y = np.random.randint(245)
+        blrd[x:x+10, y:y+10] = 255
+    blrd = cv2.GaussianBlur(blrd, (0, 0), 40)
+    return blrd
 
-def image_loader_generator(folder, bw, resize_x=640, resize_y=950, batch_size=1000, generate_bw=False):
+def image_loader_generator(folder, bw, resize_x=640, resize_y=950, batch_size=1000, generate_bw=False, generate_hints=False):
     filename_list = sorted(os.listdir(folder))
 
     i = 0
@@ -44,7 +52,10 @@ def image_loader_generator(folder, bw, resize_x=640, resize_y=950, batch_size=10
                     resized_color_image = misc.imresize(img, (resize_y, resize_x))
                     image_batch_color.append(resized_color_image)
                     if generate_bw:
-                        image_batch_bw.append(generate_adaptive_bw_image(resized_color_image))
+                        bw_img = generate_adaptive_bw_image(resized_color_image)
+                        hint = generate_hint(resized_color_image)
+                        spliced = np.concatenate((bw_img, hint), axis=2)
+                        image_batch_bw.append(spliced)
                 else:
                     j -= 1
             j += 1

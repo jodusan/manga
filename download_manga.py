@@ -11,10 +11,10 @@ maxsize = 512
 
 # for tag in tags:
 
-count = 1
+count = 0 
 
 for i in range(3000):
-    stringreturn = urllib2.urlopen("http://safebooru.org/index.php?page=dapi&s=post&q=index&tags=1girl%20solo&pid="+str(i+84)).read()
+    stringreturn = urllib2.urlopen("http://safebooru.org/index.php?page=dapi&s=post&q=index&tags=1girl%20solo&pid="+str(i+2000)).read()
     xmlreturn = untangle.parse(stringreturn)
     print i, count
     for post in xmlreturn.posts.post:
@@ -44,5 +44,5 @@ for i in range(3000):
             #                                  C=2)
 
             count += 1
-            cv2.imwrite("data/manga_dataset/"+str(count)+".jpg",cropped)
+            cv2.imwrite("data/MangaOnline/test/"+str(count)+".jpg",cropped)
             # cv2.imwrite("imgs/"+str(post["id"])+"-edge.jpg",img_edge)

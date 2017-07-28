@@ -1,4 +1,5 @@
 from scipy import misc
+import cv2
 import os
 import numpy as np
 import random
@@ -52,7 +53,7 @@ def image_loader_generator(folder, bw, resize_x=640, resize_y=950, batch_size=10
                     resized_color_image = misc.imresize(img, (resize_y, resize_x))
                     image_batch_color.append(resized_color_image)
                     if generate_bw:
-                        bw_img = generate_adaptive_bw_image(resized_color_image)
+                        bw_img = generate_adaptive_bw_image(resized_color_image)[..., None]
                         hint = generate_hint(resized_color_image)
                         spliced = np.concatenate((bw_img, hint), axis=2)
                         image_batch_bw.append(spliced)
@@ -61,7 +62,7 @@ def image_loader_generator(folder, bw, resize_x=640, resize_y=950, batch_size=10
             j += 1
             i = (i + 1) % len(filename_list)
         if generate_bw:
-            yield (np.array(image_batch_bw)/255)[..., None], np.array(image_batch_color)/255
+            yield (np.array(image_batch_bw)/255), np.array(image_batch_color)/255
         else:
             yield np.array(image_batch_color)/255
 

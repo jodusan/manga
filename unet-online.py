@@ -36,7 +36,7 @@ def color_distance(y_true, y_pred):
     return msqe+cosine_loss
 
 def get_unet(isx, isy):
-    name = "UNET-ONLINE-HINTED"
+    name = "UNET-ONLINE-HINTED1"
     inputs = Input((isx, isy, 4))
     conv1 = Conv2D(32, (3, 3), activation="relu", padding="same")(inputs)
     conv1 = Conv2D(32, (3, 3), activation="relu", padding="same")(conv1)
@@ -80,7 +80,7 @@ def get_unet(isx, isy):
     conv10 = Conv2D(3, (1, 1), activation="sigmoid")(conv9)
 
     model = Model(inputs=inputs, outputs=conv10)
-    model.compile(optimizer=keras.optimizers.Adam(lr=0.0001),
+    model.compile(optimizer=keras.optimizers.Adam(lr=0.00005),
                             loss=keras.losses.MSE,
                   metrics=["accuracy", keras.losses.MSE])
     return model, name
@@ -98,7 +98,7 @@ def main():
 
     main_model, model_name = get_unet(im_width, im_height)
 
-    weights_file = "weights/UNET-ONLINE-HINTED.hdf5"
+    weights_file = "weights/UNET-ONLINE-HINTED1.hdf5"
 
     if load_weights and os.path.isfile(weights_file):
         print("Loaded weights")
@@ -125,7 +125,7 @@ def main():
             batch_size = 1,
             generate_bw = True)
 
-#    main_model.fit_generator(train_generator, 1250, epochs=10, verbose=1, callbacks=[checkpointer, tensorboard], validation_data=val_generator, validation_steps=300)
+   # main_model.fit_generator(train_generator, 1250, epochs=30, verbose=1, callbacks=[checkpointer, tensorboard], validation_data=val_generator, validation_steps=300)
     
     #misc.imsave("predict_asdf.jpg", main_model.predict(read_img[None, ..., None])[0])
     for i in range(20):

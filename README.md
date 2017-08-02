@@ -2,6 +2,15 @@
 
 This repo contains project that we created during the [Petnica Summer Institue: Machine Learning](http://psiml.petlja.org/) seminar. For intro to the project I suggest that you skim through presentation slides on the master branch in the misc folder.
 
+## UNET without hint
+
+![example](misc/example.png)
+
+## UNET with hint
+
+![example_hinted](misc/example_hinted.png)
+
+
 # Datasets
 
 Dataset images can be _loaded_ or *patched* from a giant montage of all images.
@@ -39,18 +48,18 @@ git checkout UNET-ONLINE-HINT
 
 ## Usage
 
-**Only valid README is on the master branch**
-
-Datasets should be downloaded at the following locations:
-
--   `data/MangaOnline/train and /data/MangaOnline/test`
--   `data/Manga546/`
-
-In order to run prediction on a single image you can use predict.py files while the training can be executed by running the branch-name.py file.
+In order to run prediction on a single image you can use predict.py files while the training can be executed by running the branch-name.py file. The best results are on the UNET-ONLINE-HINT and UNET-ONLINE branches
 
 ```python
 python3 predict.py img/to/predict.ext
 ```
+
+For training datasets should be downloaded at the following locations:
+
+-   `data/MangaOnline/train and /data/MangaOnline/test`
+
+-   `data/Manga546/`
+
 
 # Credits
 

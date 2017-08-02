@@ -43,7 +43,7 @@ git checkout UNET-ONLINE-HINT
 
 Datasets should be downloaded at the following locations:
 
--   `data/MangaOnline/`
+-   `data/MangaOnline/train and /data/MangaOnline/test`
 -   `data/Manga546/`
 
 In order to run prediction on a single image you can use predict.py files while the training can be executed by running the branch-name.py file.

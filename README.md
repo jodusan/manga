@@ -1,6 +1,6 @@
 # Project MANGA PSIML2017
 
-This repo contains a project that we created during the [Petnica Summer Institue: Machine Learning](http://psiml.petlja.org/) seminar. For intro to the project I suggest that you skim through presentation slides on in the misc folder.
+This repo contains a project that we created during the [Petnica Summer Institue: Machine Learning](http://psiml.petlja.org/) seminar. For intro to the project I suggest that you skim through presentation slides in the misc folder.
 
 ## UNET without hint
 

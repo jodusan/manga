@@ -5,7 +5,7 @@ from scipy import misc
 
 from dataset import generate_hint
 from preprocess_images import generate_adaptive_bw_image
-from unet_online import get_unet
+from unet_online_hint import get_unet
 
 
 def main():

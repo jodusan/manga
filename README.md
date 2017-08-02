@@ -4,12 +4,11 @@ This repo contains a project that we created during the [Petnica Summer Institue
 
 ## UNET without hint
 
-![example](misc/example.png)
+<img src="https://github.com/dulex123/manga/raw/master/misc/example.png" width="640">
 
 ## UNET with hint
 
-![example_hinted](misc/example_hinted.png)
-
+<img src="https://github.com/dulex123/manga/raw/master/misc/example_hinted.png" width="640">
 
 # Datasets
 

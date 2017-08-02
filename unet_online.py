@@ -1,39 +1,14 @@
-import keras
-from keras import Input
-from keras.engine import Model
-from keras.models import Sequential
-from keras.callbacks import ModelCheckpoint, EarlyStopping, TensorBoard
-from keras.layers import Dense, Activation, Conv2D, Dropout, Flatten, MaxPooling2D, Convolution2D, merge, UpSampling2D, \
-    concatenate
-from dataset import height, width, load_all_images
-from preprocess_images import generate_bw_image,  generate_adaptive_bw_image 
-from dataset import generate_patches, image_loader_generator
-from scipy import misc
-import numpy as np
 import os
 
+import keras
+from keras import Input
+from keras.callbacks import ModelCheckpoint
+from keras.engine import Model
+from keras.layers import Conv2D, Dropout, MaxPooling2D, UpSampling2D, \
+    concatenate
 
-def predict_image(image, model, isz):
-    imh, imw = image.shape
-    image = image[..., None]
-    x_len = imw // (isz)
-    y_len = imh // (isz)
-    print(x_len, y_len)
-    resulting_image = np.zeros((image.shape[0], image.shape[1], 3))
-    for i in range(y_len):
-        for j in range(x_len):
-            img_patch = image[i * isz:(i + 1) * isz, j * isz:(j + 1) * isz, :]
-            resulting_image[i * isz:(i + 1) * isz, j * isz:(j + 1) * isz] = model.predict(img_patch[None, ...])
-    return resulting_image
+from dataset import image_loader_generator
 
-def color_distance(y_true, y_pred):
-    hist_true = tf.histogram_fixed_width(y_true[:, :, 0], [0, 1], nbins=256, dtype=K.floatx())
-    hist_pred = tf.histogram_fixed_width(y_pred[:, :, 0], [0, 1], nbins=256, dtype=K.floatx())
-
-    msqe = tf.losses.mean_squared_error(y_true, y_pred, weights=0.5)
-    cosine_loss = tf.losses.cosine_distance(hist_true, hist_pred, weights=0.5)
-
-    return msqe+cosine_loss
 
 def get_unet(isx, isy):
     name = "UNET-ONLINE-HINTED1"
@@ -81,20 +56,16 @@ def get_unet(isx, isy):
 
     model = Model(inputs=inputs, outputs=conv10)
     model.compile(optimizer=keras.optimizers.Adam(lr=0.00005),
-                            loss=keras.losses.MSE,
+                  loss=keras.losses.MSE,
                   metrics=["accuracy", keras.losses.MSE])
     return model, name
 
 
 def main():
-    print("Loaded dataset")
-
-#    misc.imshow(y[0])
-
     im_height = 256
     im_width = 256
 
-    load_weights = True 
+    load_weights = True
 
     main_model, model_name = get_unet(im_width, im_height)
 
@@ -104,47 +75,29 @@ def main():
         print("Loaded weights")
         main_model.load_weights(weights_file)
 
-
-    checkpointer = ModelCheckpoint('weights/'+model_name+'.hdf5')
+    checkpointer = ModelCheckpoint('weights/' + model_name + '.hdf5')
     tensorboard = keras.callbacks.TensorBoard(log_dir='./logs/test1/',
-                 histogram_freq=1,
-                 write_graph=True,
-                 write_images=False)
+                                              histogram_freq=1,
+                                              write_graph=True,
+                                              write_images=False)
 
-    train_generator = image_loader_generator("data/MangaOnline/train/", 
-            False, 
-            resize_x=im_width,
-            resize_y=im_height,
-            batch_size=16,
-            generate_bw= True)
+    train_generator = image_loader_generator("data/MangaOnline/train/",
+                                             False,
+                                             resize_x=im_width,
+                                             resize_y=im_height,
+                                             batch_size=16,
+                                             generate_bw=True)
 
-    val_generator = image_loader_generator("data/MangaOnline/test/", 
-            False,
-            resize_x = im_width,
-            resize_y = im_height,
-            batch_size = 1,
-            generate_bw = True)
+    val_generator = image_loader_generator("data/MangaOnline/test/",
+                                           False,
+                                           resize_x=im_width,
+                                           resize_y=im_height,
+                                           batch_size=1,
+                                           generate_bw=True)
 
-   # main_model.fit_generator(train_generator, 1250, epochs=30, verbose=1, callbacks=[checkpointer, tensorboard], validation_data=val_generator, validation_steps=300)
-    
-    #misc.imsave("predict_asdf.jpg", main_model.predict(read_img[None, ..., None])[0])
-    for i in range(20):
-        next(val_generator)
-    for i in range(1,11):
-        #read_img = misc.imread("data/MangaOnline/test/"+str(i)+".jpg")
-        read_img = next(val_generator)
-        
-
-        misc.imsave("out/original_"+str(i)+".jpg", read_img[1][0])
-        #print(read_img.shape)
-        #read_img = misc.imresize(read_img, (256, 256))
-        #read_img = generate_adaptive_bw_image(read_img)/255
-        #misc.imsave("out/predicted_"+str(i)+".jpg", main_model.predict(read_img[None, ..., None])[0])
-
-        misc.imsave("out/predicted_"+str(i)+".jpg", main_model.predict(read_img[0])[0]) 
+    main_model.fit_generator(train_generator, 1250, epochs=30, verbose=1, callbacks=[checkpointer, tensorboard],
+                             validation_data=val_generator, validation_steps=300)
 
 
 if __name__ == "__main__":
     main()
-
-

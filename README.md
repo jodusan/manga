@@ -65,7 +65,8 @@ For training datasets should be downloaded at the following locations:
 Released under the [MIT License].<br>
 Authored and maintained by  Dušan Josipović & Nikola Jovičić.
 
-> Github [@nikola-j](https://github.com/nikola-j) &nbsp;&middot;&nbsp;
+> Blog [jovicicnikola.com](http://jovicicnikola.com/) &nbsp;&middot;&nbsp;
+> Github [@nikola-j](https://github.com/nikola-j)
 
 > Blog [dulex123.github.io](http://dulex123.github.io) &nbsp;&middot;&nbsp;
 > GitHub [@dulex123](https://github.com/dulex123) &nbsp;&middot;&nbsp;

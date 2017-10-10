@@ -2,7 +2,7 @@ from scipy import misc
 import os
 import numpy as np
 import random
-
+import cv2
 from preprocess_images import generate_adaptive_bw_image
 
 height = 950
@@ -27,16 +27,19 @@ def load_all_images(folder, bw, resize_x=640, resize_y=950):
 
     return image_list
 
+
 def generate_hint(img):
-    blrd = img.copy()
+    blured_image = img.copy()
     for i in range(40):
         x = np.random.randint(245)
         y = np.random.randint(245)
-        blrd[x:x+10, y:y+10] = 255
-    blrd = cv2.GaussianBlur(blrd, (0, 0), 40)
-    return blrd
+        blured_image[x:x + 10, y:y + 10] = 255
+    blured_image = cv2.GaussianBlur(blured_image, (0, 0), 40)
+    return blured_image
 
-def image_loader_generator(folder, bw, resize_x=640, resize_y=950, batch_size=1000, generate_bw=False, generate_hints=False):
+
+def image_loader_generator(folder, bw, resize_x=640, resize_y=950, batch_size=1000, generate_bw=False,
+                           generate_hints=True):
     filename_list = sorted(os.listdir(folder))
 
     i = 0
@@ -53,7 +56,10 @@ def image_loader_generator(folder, bw, resize_x=640, resize_y=950, batch_size=10
                     image_batch_color.append(resized_color_image)
                     if generate_bw:
                         bw_img = generate_adaptive_bw_image(resized_color_image)
-                        hint = generate_hint(resized_color_image)
+                        if generate_hints:
+                            hint = generate_hint(resized_color_image)
+                        else:
+                            hint = resized_color_image
                         spliced = np.concatenate((bw_img, hint), axis=2)
                         image_batch_bw.append(spliced)
                 else:
@@ -61,9 +67,9 @@ def image_loader_generator(folder, bw, resize_x=640, resize_y=950, batch_size=10
             j += 1
             i = (i + 1) % len(filename_list)
         if generate_bw:
-            yield (np.array(image_batch_bw)/255)[..., None], np.array(image_batch_color)/255
+            yield (np.array(image_batch_bw) / 255)[..., None], np.array(image_batch_color) / 255
         else:
-            yield np.array(image_batch_color)/255
+            yield np.array(image_batch_color) / 255
 
 
 def make_giant_image(image_list):
@@ -97,7 +103,7 @@ def generate_patches(image_x, image_y, amount=1000, patch_wh=128):
     return result_x / 255, result_y / 255
 
 
-if __name__ == "__main__":
+def main():
     photo_format = 'png'
     number_of_images = 500
 
@@ -114,3 +120,7 @@ if __name__ == "__main__":
 
     r = make_giant_image(x[:number_of_images])
     misc.imsave('train_dataset/' + photo_type + "." + photo_format, r)
+
+
+if __name__ == "__main__":
+    main()

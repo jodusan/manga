@@ -80,14 +80,14 @@ def main():
                                               write_graph=True,
                                               write_images=False)
 
-    train_generator = image_loader_generator("data/MangaOnline/train/",
+    train_generator = image_loader_generator("dataset/manga_dataset_train",
                                              False,
                                              resize_x=im_width,
                                              resize_y=im_height,
                                              batch_size=16,
                                              generate_bw=True)
 
-    val_generator = image_loader_generator("data/MangaOnline/test/",
+    val_generator = image_loader_generator("dataset/manga_dataset_val",
                                            False,
                                            resize_x=im_width,
                                            resize_y=im_height,
@@ -96,6 +96,7 @@ def main():
 
     main_model.fit_generator(train_generator, 1250, epochs=10, verbose=1, callbacks=[checkpointer, tensorboard],
                              validation_data=val_generator, validation_steps=100)
+
 
 if __name__ == "__main__":
     main()

@@ -3,7 +3,6 @@ import cv2
 import os
 import numpy as np
 import random
-import matplotlib.pyplot as plt
 
 from preprocess_images import generate_adaptive_bw_image
 
@@ -30,55 +29,19 @@ def load_all_images(folder, bw, resize_x=640, resize_y=950):
     return image_list
 
 
-# def generate_hint(img, point_num_override=None):
-#     blurred_image = np.zeros(img.shape)
-#     blurred_image[:, :, :] = 255
-#     w, h, _ = img.shape
-#     patch_size = 3
-#     point_num = np.round((1 - np.power(1 - random.random(), 1 / 3)) *
-#                          (200 * random.random())
-#                          ).astype(np.int32)
-#     if point_num_override is not None:
-#         point_num = point_num_override
-#     # point_num = 20
-#     for i in range(point_num):
-#         x = np.random.randint(w - patch_size - 1)
-#         y = np.random.randint(h - patch_size - 1)
-#         blurred_image[x:x + patch_size, y:y + patch_size, :] = \
-#             img[x:x + patch_size, y:y + patch_size, :]
-#     plt.imshow(blurred_image)
-#     plt.show()
-#     blur = cv2.(blurred_image, (20, 20))
-#     plt.imshow(blur)
-#     plt.show()
-#     return blur
+def generate_hint(img, white_out=40):
+    blrd = img.copy()
+    for i in range(white_out):
+        x = np.random.randint(245)
+        y = np.random.randint(245)
+        blrd[x:x + 10, y:y + 10] = 255
+    blrd = cv2.GaussianBlur(blrd, (0, 0), 40)
+    return blrd
 
 
-# def imageblur(self, cimg, sampling=False):
-#     if sampling:
-#         cimg = cimg * 0.3 + np.ones_like(cimg) * 0.7 * 255
-#     else:
-#         for i in range(30):
-#             randx = np.random.randint(0, 205)
-#             randy = np.random.randint(0, 205)
-#             cimg[randx:randx + 50, randy:randy + 50] = 255
-#     return cv2.blur(cimg, (100, 100))
-
-def generate_hint(img, str=1):
-    blurred_image = img.copy()
-    h, w, _ = img.shape
-    patch_size = 20
-    for i in range(40):
-        x = np.random.randint(w - patch_size - 1)
-        y = np.random.randint(h - patch_size - 1)
-        blurred_image[x:x + patch_size, y:y + patch_size] = 255
-    blurred_image = cv2.blur(blurred_image, (h // 2 // str, w // 2 // str))
-    return blurred_image
-
-
-def image_loader_generator(folder, bw, resize_x=512, resize_y=512,
+def image_loader_generator(folder, bw, resize_x=640, resize_y=950,
                            batch_size=1000, generate_bw=False,
-                           generate_hints=True):
+                           generate_hints=False):
     filename_list = sorted(os.listdir(folder))
 
     i = 0
@@ -96,15 +59,10 @@ def image_loader_generator(folder, bw, resize_x=512, resize_y=512,
                                                         (resize_y, resize_x))
                     image_batch_color.append(resized_color_image)
                     if generate_bw:
-                        bw_img = misc.imresize(
-                            generate_adaptive_bw_image(img),
-                            (resize_x, resize_y)
-                        )[..., None]
-                        # bw_img[bw_img < 127] = 0
-                        if generate_hints:
-                            hint = generate_hint(resized_color_image)
-                        else:
-                            hint = resized_color_image
+                        bw_img = \
+                        generate_adaptive_bw_image(resized_color_image)[
+                            ..., None]
+                        hint = generate_hint(resized_color_image)
                         spliced = np.concatenate((bw_img, hint), axis=2)
                         image_batch_bw.append(spliced)
                 else:
@@ -155,30 +113,17 @@ def generate_patches(image_x, image_y, amount=1000, patch_wh=128):
 if __name__ == "__main__":
     photo_format = 'png'
     number_of_images = 500
-    gen = next(image_loader_generator('datasets/manga_dataset_train/', False,
-                                      generate_bw=True, batch_size=50,
-                                      resize_x=128, resize_y=128))
-    i = 0
-    for j in range(50):
-        print(gen[i][j].shape)
-        plt.imshow(gen[i][j][:, :, 0], cmap='gray')
-        plt.show()
 
-        plt.imshow(gen[i][j][:, :, 1:4])
-        plt.show()
+    photo_type = 'color'
+    x = load_all_images('train_dataset/' + photo_type, False)
+    print("Loaded", len(x), "images")
 
-        plt.imshow(gen[1][j][:, :, :])
-        plt.show()
-        # photo_type = 'color'
-        # x = load_all_images('train_dataset/' + photo_type, False)
-        # print("Loaded", len(x), "images")
-        #
-        # r = make_giant_image(x[:number_of_images])
-        # misc.imsave('train_dataset/' + photo_type + "." + photo_format, r)
-        #
-        # photo_type = 'bw'
-        # x = load_all_images('train_dataset/' + photo_type, False)
-        # print("Loaded", len(x), "images")
-        #
-        # r = make_giant_image(x[:number_of_images])
-        # misc.imsave('train_dataset/' + photo_type + "." + photo_format, r)
+    r = make_giant_image(x[:number_of_images])
+    misc.imsave('train_dataset/' + photo_type + "." + photo_format, r)
+
+    photo_type = 'bw'
+    x = load_all_images('train_dataset/' + photo_type, False)
+    print("Loaded", len(x), "images")
+
+    r = make_giant_image(x[:number_of_images])
+    misc.imsave('train_dataset/' + photo_type + "." + photo_format, r)

@@ -1,10 +1,11 @@
 import sys
 
+from matplotlib.pyplot import imshow, show
 from scipy import misc
 
 from preprocess_images import generate_adaptive_bw_image
 from unet_online import get_unet
-
+import numpy as np
 
 def main():
     im_height = 256
@@ -23,8 +24,8 @@ def main():
 
     color_image = color_image[None, ..., None] / 255
 
-    misc.imsave("prediction.jpg", main_model.predict(color_image)[0])
-
+    imshow(np.uint8(main_model.predict(color_image)[0]*255))
+    show()
 
 if __name__ == "__main__":
     main()

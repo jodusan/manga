@@ -1,12 +1,11 @@
+import os
 import sys
 
 import cv2
-import os
 import numpy as np
 from matplotlib.pyplot import imshow, show
 from scipy import misc
 
-from dataset import generate_hint
 from preprocess_images import generate_adaptive_bw_image
 from unet_online_hint import get_unet
 

@@ -33,23 +33,28 @@ def main():
     plt.imshow(bw_img[:, :, 0], 'gray')
     plt.show()
 
-    for i in range(0, 10):
-        if i == 0:
-            hint = cv2.blur(np.concatenate((bw_img, bw_img, bw_img), axis=2),
-                            (40, 40))
-        elif i == 1:
-            hint = np.ones(color_img.shape)*255
-        else:
-            # hint = cv2.GaussianBlur(color_img, (0, 0), 40)
-            hint = cv2.blur(color_img, (i * 10, i * 10))
-        plt.imshow(hint)
+    for i in range(2, 10):
+        # if i == 0:
+        #     hint = cv2.blur(np.concatenate((bw_img, bw_img, bw_img), axis=2),
+        #                     (40, 40))
+        # elif i == 1:
+        #     hint = np.ones(color_img.shape)*255
+        # elif i == 2:
+        # else:
+        #     # hint = cv2.GaussianBlur(color_img, (0, 0), 40)
+        #     hint = cv2.blur(color_img, (i * 10, i * 10))
+        hint = color_img
+        hint = hint * 0.1*i + np.ones_like(hint) * (1-0.1*i) * 255
+
+        hint[hint > 255] = 255
+        plt.imshow(np.uint8(hint))
         plt.show()
         spliced = np.concatenate((bw_img, hint), axis=2) / 255
 
-        prediction = main_model.predict(spliced[None, ...])[0]
-        prediction[prediction > 1] = 1
+        prediction = main_model.predict(spliced[None, ...])[0]*255
+        prediction[prediction > 255] = 255
         prediction[prediction < 0] = 0
-        plt.imshow(prediction)
+        plt.imshow(np.uint8(prediction))
         plt.show()
 
 

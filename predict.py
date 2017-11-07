@@ -3,7 +3,7 @@ import sys
 
 import cv2
 import numpy as np
-from matplotlib.pyplot import imshow, show
+from matplotlib.pyplot import imsave
 from scipy import misc
 
 from preprocess_images import generate_adaptive_bw_image
@@ -19,8 +19,6 @@ def main():
 
     main_model.load_weights(weights_file)
     is_directory = True
-
-    color_blur_slider = float(sys.argv[1])
 
     try:
         files = os.listdir(sys.argv[2])
@@ -40,8 +38,7 @@ def main():
                 (256, 256)
             )[:, :, :3]
 
-        imshow(color_img)
-        show()
+        imsave("results/color.png", color_img)
         if len(sys.argv) > 3 and not is_directory:
             bw_img = misc.imread(sys.argv[3])
             # bw_img = np.stack((bw_img, bw_img, bw_img), axis=2)
@@ -53,8 +50,7 @@ def main():
         else:
             bw_img = generate_adaptive_bw_image(color_img)[..., None]
 
-        imshow(bw_img[:, :, 0])
-        show()
+        imsave("results/lines.png", bw_img[:, :, 0], cmap='gray')
 
         hint1 = color_img
         # hint1 = cv2.GaussianBlur(color_img, (0, 0), 10)
@@ -80,17 +76,17 @@ def main():
         #
         # imshow(np.uint8(prediction))
         # show()
+        for color_blur_slider in [0.0, 0.1, 0.2, 0.3, 0.5, 0.7]:
+            hint3 = color_blur_slider * hint1 + (1 - color_blur_slider) * hint2
+            imsave("results/hint " + str(color_blur_slider) + ".png",
+                   np.uint8(hint3))
 
-        hint3 = color_blur_slider * hint1 + (1-color_blur_slider) * hint2
-        imshow(np.uint8(hint3))
-        show()
+            spliced = np.concatenate((bw_img, hint3), axis=2) / 255
 
-        spliced = np.concatenate((bw_img, hint3), axis=2) / 255
+            prediction = main_model.predict(spliced[None, ...])[0] * 255
 
-        prediction = main_model.predict(spliced[None, ...])[0] * 255
-
-        imshow(np.uint8(prediction))
-        show()
+            imsave("results/prediction " + str(color_blur_slider) + ".png",
+                   np.uint8(prediction))
 
 
 if __name__ == "__main__":

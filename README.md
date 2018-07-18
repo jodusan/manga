@@ -1,6 +1,6 @@
 # Project MANGA PSIML2017
 
-This repo contains a project that we created during the [Petnica Summer Institue: Machine Learning](http://psiml.petlja.org/) seminar. For intro to the project I suggest that you skim through presentation slides in the misc folder.
+This repo contains a project that we created during the [Petnica Summer Institue: Machine Learning](http://psiml.petlja.org/) seminar. For intro to the project I suggest that you look at [this](https://nikola-j.github.io/project_manga/) blog post.
 
 ## UNET without hint
 
@@ -65,7 +65,7 @@ For training datasets should be downloaded at the following locations:
 Released under the [MIT License].<br>
 Authored and maintained by  Dušan Josipović & Nikola Jovičić.
 
-> Blog [jovicicnikola.com](http://jovicicnikola.com/) &nbsp;&middot;&nbsp;
+> Blog [nikola-j.github.io](http://nikola-j.github.io) &nbsp;&middot;&nbsp;
 > Github [@nikola-j](https://github.com/nikola-j)
 
 > Blog [dulex123.github.io](http://dulex123.github.io) &nbsp;&middot;&nbsp;
